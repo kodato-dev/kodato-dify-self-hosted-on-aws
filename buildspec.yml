@@ -3,9 +3,11 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      nodejs: 22
+      nodejs: 24.22.1
   pre_build:
     commands:
+      - node --version
+      - node -p 'process.execPath'
       - echo Installing source NPM dependencies...
       - ls -la
       - npm ci
