@@ -11,6 +11,7 @@ export interface WebServiceProps {
   alb: IAlb;
 
   imageTag: string;
+  image?: ecs.ContainerImage;
 
   /**
    * If true, enable debug outputs
@@ -37,9 +38,11 @@ export class WebService extends Construct {
     });
 
     taskDefinition.addContainer('Main', {
-      image: customRepository
-        ? ecs.ContainerImage.fromEcrRepository(customRepository, `dify-web_${props.imageTag}`)
-        : ecs.ContainerImage.fromRegistry(`langgenius/dify-web:${props.imageTag}`),
+      image:
+        props.image ??
+        (customRepository
+          ? ecs.ContainerImage.fromEcrRepository(customRepository, `dify-web_${props.imageTag}`)
+          : ecs.ContainerImage.fromRegistry(`langgenius/dify-web:${props.imageTag}`)),
       environment: {
         // The log level for the application. Supported values are `DEBUG`, `INFO`, `WARNING`, `ERROR`, `CRITICAL`
         LOG_LEVEL: debug ? 'DEBUG' : 'ERROR',

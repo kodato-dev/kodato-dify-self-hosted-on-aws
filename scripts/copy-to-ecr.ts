@@ -10,7 +10,7 @@ const difyPluginDaemonImageTag = props.difyPluginDaemonImageTag ?? 'main-local';
 const repositoryName = props.customEcrRepositoryName;
 
 const DOCKER_HUB_IMAGES = [
-  `langgenius/dify-web:${difyImageTag}`,
+  ...(props.difyWebImage ? [] : [`langgenius/dify-web:${difyImageTag}`]),
   `langgenius/dify-api:${difyImageTag}`,
   `langgenius/dify-sandbox:${difySandboxImageTag}`,
   `langgenius/dify-plugin-daemon:${difyPluginDaemonImageTag}`,

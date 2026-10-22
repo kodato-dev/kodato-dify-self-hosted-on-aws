@@ -34,6 +34,35 @@ You must have the following dependencies installed to deploy this app:
 ## Deploy
 You can adjust configuration parameters such as AWS regions by modifying [`bin/cdk.ts`](bin/cdk.ts). Please also check [`EnvironmentProps` interface](./lib/environment-props.ts) for all the available parameters.
 
+### Node.js security update for the Web image (October 2026)
+
+`bin/cdk.ts` selects a Web-only Docker asset from `lib/constructs/dify-services/docker/web/Dockerfile`.
+It combines the unchanged official Dify **1.11.1** application and PM2 files with **Node.js 22.23.4 / Alpine 3.23**.
+Both source images are pinned to their `linux/amd64` manifest digests. This is a locally maintained runtime patch, not an upstream Dify release.
+The API, worker, plugin daemon, database schema, and Web/API application version pairing remain unchanged. This change does not resolve unrelated Dify vulnerabilities.
+
+The Web task continues to run as UID/GID 1001 and logs the actual Node.js version and executable path at startup.
+`difyWebImage` takes precedence over the default Web image and `customEcrRepositoryName`; CDK publishes this Docker asset to its bootstrap ECR repository.
+`scripts/copy-to-ecr.ts` skips the unused upstream Web image when an override is configured. The build machine must have Docker and access to the pinned source images and the Alpine package repository, including for closed-network deployments.
+
+Validate before deploying:
+
+```bash
+npm ci
+npm run build
+npm test -- --runInBand
+docker build --platform linux/amd64 -t dify-web-node-security:1.11.1-node22.23.4 lib/constructs/dify-services/docker/web
+python3 test/web-runtime-smoke.py
+```
+
+The container test checks Node.js, unchanged application files, native image processing, page responses, static assets, and startup logging. It does not test authenticated business workflows.
+The CDK regression test checks that only the Web task image and its ECR pull permissions change.
+
+Roll out to one environment at a time. Review `cdk diff` for Web-only changes, then verify login, a representative chat and workflow, and the `node_runtime` log in the target environment.
+No database migration is introduced by this runtime patch. The existing deployment configuration still enables API auto-migration; any unrelated API task change must be reviewed separately.
+To roll back the Web runtime, remove the `difyWebImage` override and redeploy the Web task; this restores the original, unpatched Node.js image and requires a follow-up security fix.
+For a future Dify upgrade, update the API/Web application versions together and revalidate the Dockerfile source image, runtime, native modules, and database migration plan.
+
 Then you can run the following commands to deploy the entire stack.
 
 ```sh

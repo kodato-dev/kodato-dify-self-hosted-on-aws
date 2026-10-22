@@ -164,6 +164,7 @@ export class DifyOnAwsStack extends cdk.Stack {
       cluster,
       alb,
       imageTag,
+      image: props.difyWebImage,
       customRepository,
       additionalEnvironmentVariables: props.additionalEnvironmentVariables,
       useFargateSpot,

@@ -1,3 +1,5 @@
+import { ContainerImage } from 'aws-cdk-lib/aws-ecs';
+
 /**
  * The configuration parameters for a Dify environment
  */
@@ -100,6 +102,12 @@ export interface EnvironmentProps {
    * @default "latest"
    */
   difyImageTag?: string;
+
+  /**
+   * Optional Web-only image. API and worker continue to use difyImageTag.
+   * Use a matching Dify application version when patching the Node.js runtime.
+   */
+  difyWebImage?: ContainerImage;
 
   /**
    * The image tag to deploy the Dify sandbox container image.

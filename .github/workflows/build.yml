@@ -8,6 +8,14 @@ on:
   workflow_dispatch:
   pull_request:
 jobs:
+  Web-Runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the patched Web image
+        run: docker build --platform linux/amd64 -t dify-web-node-security:1.11.1-node22.23.4 lib/constructs/dify-services/docker/web
+      - name: Compare runtime and Web responses with upstream
+        run: python3 test/web-runtime-smoke.py
   Build-and-Test-CDK:
     runs-on: ubuntu-latest
     steps:

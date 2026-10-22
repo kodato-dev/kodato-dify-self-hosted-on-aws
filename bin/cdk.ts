@@ -4,6 +4,9 @@ import * as cdk from 'aws-cdk-lib';
 import { DifyOnAwsStack } from '../lib/dify-on-aws-stack';
 import { UsEast1Stack } from '../lib/us-east-1-stack';
 import { EnvironmentProps } from '../lib/environment-props';
+import { ContainerImage } from 'aws-cdk-lib/aws-ecs';
+import { Platform } from 'aws-cdk-lib/aws-ecr-assets';
+import * as path from 'path';
 
 // 環境変数からIPアドレスを読み取る関数
 const parseIpAddresses = (envVar: string | undefined): string[] | undefined => {
@@ -19,6 +22,10 @@ export const props: EnvironmentProps = {
   awsAccount: process.env.CDK_DEFAULT_ACCOUNT!,
   // Set Dify version
   difyImageTag: '1.11.1',
+  // Keep the 1.11.1 Web application paired with the existing API; patch its runtime.
+  difyWebImage: ContainerImage.fromAsset(path.join(__dirname, '../lib/constructs/dify-services/docker/web'), {
+    platform: Platform.LINUX_AMD64,
+  }),
   // Set plugin-daemon version to stable release
   difyPluginDaemonImageTag: '0.5.1-local',
 
