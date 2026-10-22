@@ -31,3 +31,12 @@ jobs:
           npm run test
         working-directory: ./
         name: snaphost test
+      - name: Synthesize with offline test context
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          fs.writeFileSync('cdk.context.json', JSON.stringify({
+            'availability-zones:account=123456789012:region=us-west-2': ['us-west-2a', 'us-west-2b'],
+          }));
+          NODE
+          npx cdk synth --lookups=false --app 'CDK_DEFAULT_ACCOUNT=123456789012 npx ts-node --prefer-ts-exts bin/cdk.ts'

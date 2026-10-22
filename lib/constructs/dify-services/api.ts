@@ -41,6 +41,16 @@ export interface ApiServiceProps {
 
   autoMigration: boolean;
   useFargateSpot: boolean;
+
+  /**
+   * The amount of CPU units allocated to the task.
+   */
+  cpu: number;
+
+  /**
+   * The amount of memory (in MiB) allocated to the task.
+   */
+  memoryLimitMiB: number;
 }
 
 export class ApiService extends Construct {
@@ -53,8 +63,10 @@ export class ApiService extends Construct {
     const volumeName = 'sandbox';
 
     const taskDefinition = new FargateTaskDefinition(this, 'Task', {
-      cpu: 2048,
-      memoryLimitMiB: 4096, // Upsized from 1024/2048 to fix CPU exhaustion (105% usage observed)
+      // The plugin-daemon container installs plugin dependencies and pre-compiles them on every
+      // task startup, which used to cause an OOM crash loop with the previous default (2048 MiB).
+      cpu: props.cpu,
+      memoryLimitMiB: props.memoryLimitMiB,
       runtimePlatform: { cpuArchitecture: CpuArchitecture.X86_64 },
       volumes: [
         {
@@ -436,6 +448,7 @@ export class ApiService extends Construct {
       ],
       enableExecuteCommand: true,
       minHealthyPercent: 100,
+      // desiredCount: 3, // set this for scaling out (default: 1)
     });
 
     postgres.connections.allowDefaultPortFrom(service);
