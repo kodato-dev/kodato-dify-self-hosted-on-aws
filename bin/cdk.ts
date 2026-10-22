@@ -21,13 +21,13 @@ export const props: EnvironmentProps = {
   awsRegion: 'us-west-2',
   awsAccount: process.env.CDK_DEFAULT_ACCOUNT!,
   // Set Dify version
-  difyImageTag: '1.11.1',
-  // Keep the 1.11.1 Web application paired with the existing API; patch its runtime.
+  difyImageTag: '1.13.3',
+  // Keep the 1.13.3 Web application paired with the API; patch only its runtime.
   difyWebImage: ContainerImage.fromAsset(path.join(__dirname, '../lib/constructs/dify-services/docker/web'), {
     platform: Platform.LINUX_AMD64,
   }),
   // Set plugin-daemon version to stable release
-  difyPluginDaemonImageTag: '0.5.1-local',
+  difyPluginDaemonImageTag: '0.5.5-local',
 
   // WAF設定 - 環境変数からIPアドレスを読み取り
   // 環境変数が設定されていない場合は、すべてのIPアドレスを許可（デフォルト）

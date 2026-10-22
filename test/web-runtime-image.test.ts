@@ -9,8 +9,8 @@ function synth(patched: boolean, customEcrRepositoryName?: string) {
   const app = new cdk.App();
   const stack = new DifyOnAwsStack(app, 'TestStack', {
     env: { region: 'us-west-2', account: '123456789012' },
-    difyImageTag: '1.11.1',
-    difyPluginDaemonImageTag: '0.5.1-local',
+    difyImageTag: '1.13.3',
+    difyPluginDaemonImageTag: '0.5.5-local',
     difySandboxImageTag: '0.2.4',
     useCloudFront: false,
     customEcrRepositoryName,
@@ -40,7 +40,7 @@ test.each([undefined, 'dify-images'])(
     const oldTask = baseline.Resources[webTaskId];
     const newTask = patched.Resources[webTaskId];
     expect(JSON.stringify(oldTask.Properties.ContainerDefinitions[0].Image)).toContain(
-      repositoryName ? 'dify-web_1.11.1' : 'langgenius/dify-web:1.11.1',
+      repositoryName ? 'dify-web_1.13.3' : 'langgenius/dify-web:1.13.3',
     );
     expect(JSON.stringify(newTask.Properties.ContainerDefinitions[0].Image)).toContain(
       'cdk-hnb659fds-container-assets',

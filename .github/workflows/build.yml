@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Build the patched Web image
-        run: docker build --platform linux/amd64 -t dify-web-node-security:1.11.1-node22.23.4 lib/constructs/dify-services/docker/web
+        run: docker build --platform linux/amd64 -t dify-web-node-security:1.13.3-node22.23.4 lib/constructs/dify-services/docker/web
       - name: Compare runtime and Web responses with upstream
         run: python3 test/web-runtime-smoke.py
   Build-and-Test-CDK:
@@ -39,3 +39,12 @@ jobs:
           npm run test
         working-directory: ./
         name: snaphost test
+      - name: Synthesize with offline test context
+        run: |
+          node - <<'NODE'
+          const fs = require('fs');
+          fs.writeFileSync('cdk.context.json', JSON.stringify({
+            'availability-zones:account=123456789012:region=us-west-2': ['us-west-2a', 'us-west-2b'],
+          }));
+          NODE
+          npx cdk synth --lookups=false --app 'CDK_DEFAULT_ACCOUNT=123456789012 npx ts-node --prefer-ts-exts bin/cdk.ts'

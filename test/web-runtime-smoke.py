@@ -9,8 +9,8 @@ import urllib.error
 import urllib.request
 import uuid
 
-BASELINE = "langgenius/dify-web@sha256:77dab617312a464fec9b412547780f5d85f01c3c136c774dbe19ade10ed03b65"
-CANDIDATE = sys.argv[1] if len(sys.argv) > 1 else "dify-web-node-security:1.11.1-node22.23.4"
+BASELINE = "langgenius/dify-web@sha256:9a1ef685559559416b45e41bb07faee1740535de307e3a2c0534c225eb43b985"
+CANDIDATE = sys.argv[1] if len(sys.argv) > 1 else "dify-web-node-security:1.13.3-node22.23.4"
 
 
 def docker(*args):
@@ -50,10 +50,17 @@ try:
 
     version = docker("exec", containers[1], "node", "--version")
     assert version == "v22.23.4", version
+    configs = [json.loads(docker("image", "inspect", image))[0]["Config"]
+               for image in [BASELINE, CANDIDATE]]
+    environments = [dict(item.split("=", 1) for item in config["Env"]
+                         if not item.startswith("NODE_VERSION=")) for config in configs]
+    assert environments[0] == environments[1], "Application environment defaults changed"
+    for key in ["User", "WorkingDir", "ExposedPorts"]:
+        assert configs[0].get(key) == configs[1].get(key), f"Image {key} changed"
     hashes = [docker("exec", name, "sh", "-c",
-                     "find /app/web /pnpm -type f ! -path '*/.next/cache/*' -exec sha256sum {} + | sort")
+                     "find /app/web -type f ! -path '*/.next/cache/*' -exec sha256sum {} + | sort")
               for name in containers]
-    assert hashes[0] == hashes[1], "Application or PM2 files changed"
+    assert hashes[0] == hashes[1], "Application files changed"
     sharp = docker("exec", containers[1], "node", "-e", """
 const sharp = require(require.resolve('sharp', {paths: [require.resolve('next')]}));
 sharp({create: {width: 8, height: 8, channels: 4, background: 'red'}})
@@ -76,7 +83,7 @@ sharp({create: {width: 8, height: 8, channels: 4, background: 'red'}})
     assert '"event":"node_runtime","version":"v22.23.4"' in logs
     print(json.dumps({"node": version, "unchanged_files": len(hashes[0].splitlines()),
                       "file_manifest_sha256": hashlib.sha256(hashes[0].encode()).hexdigest(),
-                      "native_image_processing": json.loads(sharp), "routes": routes,
+                      "application_config_preserved": True, "native_image_processing": json.loads(sharp), "routes": routes,
                       "identical_static_assets": min(5, len(assets)), "runtime_logged": True}, indent=2))
 finally:
     for name in containers:

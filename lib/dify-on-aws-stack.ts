@@ -36,6 +36,9 @@ export class DifyOnAwsStack extends cdk.Stack {
       internalAlb = false,
       useFargateSpot = false,
       subDomain = 'dify',
+      // Preserve this fork's CPU exhaustion mitigation when the size is not overridden.
+      apiServiceCpu = 2048,
+      apiServiceMemoryLimitMiB = 4096,
     } = props;
 
     if (props.vpcId && (props.vpcIsolated != null || props.useNatInstance != null)) {
@@ -158,6 +161,8 @@ export class DifyOnAwsStack extends cdk.Stack {
       additionalEnvironmentVariables: props.additionalEnvironmentVariables,
       autoMigration: true,
       useFargateSpot,
+      cpu: apiServiceCpu,
+      memoryLimitMiB: apiServiceMemoryLimitMiB,
     });
 
     new WebService(this, 'WebService', {
