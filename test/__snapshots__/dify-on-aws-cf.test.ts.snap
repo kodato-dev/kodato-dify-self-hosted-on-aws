@@ -39,7 +39,7 @@ exports[`Snapshot test (with CloudFront) 1`] = `
       "Properties": {
         "Code": {
           "S3Bucket": "cdk-hnb659fds-assets-123456789012-us-east-1",
-          "S3Key": "8a17fb3ceee821f797100bf65fa3047c164a08c03aa5a07fbcff9a676fb73b97.zip",
+          "S3Key": "08b23c75a1fe108c9fbd7896f6d7a668289c804be7852d611aecf2a0b501279f.zip",
         },
         "Handler": "__entrypoint__.handler",
         "MemorySize": 128,
@@ -49,7 +49,7 @@ exports[`Snapshot test (with CloudFront) 1`] = `
             "Arn",
           ],
         },
-        "Runtime": "nodejs22.x",
+        "Runtime": "nodejs24.x",
         "Timeout": 900,
       },
       "Type": "AWS::Lambda::Function",
@@ -306,7 +306,7 @@ exports[`Snapshot test (with CloudFront) 2`] = `
       "Properties": {
         "Code": {
           "S3Bucket": "cdk-hnb659fds-assets-123456789012-us-west-2",
-          "S3Key": "bc8ef58951f4c88e641dd23090e9d2e2e61c7530a07960e767522941e959b625.zip",
+          "S3Key": "9b8fce7ae7f25ef82fdbaf6b72523b99d0875c0c9c826642819fb51f11d9b125.zip",
         },
         "Handler": "index.handler",
         "Role": {
@@ -315,7 +315,7 @@ exports[`Snapshot test (with CloudFront) 2`] = `
             "Arn",
           ],
         },
-        "Runtime": "nodejs22.x",
+        "Runtime": "nodejs24.x",
         "Timeout": 120,
       },
       "Type": "AWS::Lambda::Function",
@@ -708,6 +708,12 @@ exports[`Snapshot test (with CloudFront) 2`] = `
             "dify.example.com",
           ],
           "Comment": "Dify distribution (TestStack - us-west-2)",
+          "CustomErrorResponses": [
+            {
+              "ErrorCachingMinTTL": 0,
+              "ErrorCode": 404,
+            },
+          ],
           "DefaultCacheBehavior": {
             "AllowedMethods": [
               "GET",
@@ -2828,7 +2834,7 @@ exports[`Snapshot test (with CloudFront) 2`] = `
       "Properties": {
         "Code": {
           "S3Bucket": "cdk-hnb659fds-assets-123456789012-us-west-2",
-          "S3Key": "d41c8e6342cd078b5ea5aec11522bdb605eae00f4bb98a3fb0b44c827e9b5ca9.zip",
+          "S3Key": "f8b7112ff78fd0b6fab4c6b048fc1da9945198135db9a1e6b1d5cb4599d5a3d2.zip",
         },
         "Handler": "__entrypoint__.handler",
         "MemorySize": 128,
@@ -2838,7 +2844,7 @@ exports[`Snapshot test (with CloudFront) 2`] = `
             "Arn",
           ],
         },
-        "Runtime": "nodejs22.x",
+        "Runtime": "nodejs24.x",
         "Timeout": 900,
       },
       "Type": "AWS::Lambda::Function",
@@ -2924,7 +2930,7 @@ exports[`Snapshot test (with CloudFront) 2`] = `
             "Arn",
           ],
         },
-        "Runtime": "nodejs22.x",
+        "Runtime": "nodejs24.x",
         "Timeout": 900,
       },
       "Type": "AWS::Lambda::Function",
@@ -3166,7 +3172,7 @@ exports[`Snapshot test (with CloudFront) 2`] = `
             "Arn",
           ],
         },
-        "Runtime": "nodejs22.x",
+        "Runtime": "nodejs24.x",
         "Timeout": 900,
       },
       "Type": "AWS::Lambda::Function",
@@ -3229,7 +3235,7 @@ exports[`Snapshot test (with CloudFront) 2`] = `
     "PostgresCluster53E5BDAB": {
       "DeletionPolicy": "Delete",
       "Properties": {
-        "AutoMinorVersionUpgrade": false,
+        "AutoMinorVersionUpgrade": true,
         "CopyTagsToSnapshot": true,
         "DBClusterParameterGroupName": {
           "Ref": "PostgresParameterGroupC3694DF2",
@@ -3240,7 +3246,7 @@ exports[`Snapshot test (with CloudFront) 2`] = `
         "DatabaseName": "main",
         "EnableHttpEndpoint": true,
         "Engine": "aurora-postgresql",
-        "EngineVersion": "15.12",
+        "EngineVersion": "15",
         "MasterUserPassword": {
           "Fn::Join": [
             "",
@@ -3449,8 +3455,8 @@ exports[`Snapshot test (with CloudFront) 2`] = `
     "PostgresQuery0FD53F567": {
       "DeletionPolicy": "Delete",
       "DependsOn": [
+        "PostgresClusterWriterF88DD8CC",
         "PostgresQuery0CustomResourcePolicy41175230",
-        "PostgresWaitForHttpEndpointReady6D04AFAC",
       ],
       "Properties": {
         "Create": {
@@ -3628,24 +3634,6 @@ exports[`Snapshot test (with CloudFront) 2`] = `
         ],
       },
       "Type": "AWS::IAM::Policy",
-    },
-    "PostgresWaitForHttpEndpointReady6D04AFAC": {
-      "DeletionPolicy": "Delete",
-      "DependsOn": [
-        "PostgresClusterWriterF88DD8CC",
-      ],
-      "Properties": {
-        "ServiceToken": {
-          "Fn::GetAtt": [
-            "TimeSleepCustomResourceHandler494c1b460d2f4e3b9bfd0b2cf10162f981117264",
-            "Arn",
-          ],
-        },
-        "createDurationSeconds": 60,
-        "destroyDurationSeconds": 0,
-      },
-      "Type": "Custom::TimeSleep",
-      "UpdateReplacePolicy": "Delete",
     },
     "RedisAuthToken9E34F6A5": {
       "DeletionPolicy": "Delete",
@@ -3897,59 +3885,6 @@ exports[`Snapshot test (with CloudFront) 2`] = `
         },
       },
       "Type": "AWS::S3::BucketPolicy",
-    },
-    "TimeSleepCustomResourceHandler494c1b460d2f4e3b9bfd0b2cf10162f981117264": {
-      "DependsOn": [
-        "TimeSleepCustomResourceHandler494c1b460d2f4e3b9bfd0b2cf10162f9ServiceRole47E386BD",
-      ],
-      "Properties": {
-        "Code": {
-          "ZipFile": ""use strict";var o=Object.defineProperty;var n=Object.getOwnPropertyDescriptor;var d=Object.getOwnPropertyNames;var p=Object.prototype.hasOwnProperty;var u=(t,e)=>{for(var s in e)o(t,s,{get:e[s],enumerable:!0})},R=(t,e,s,a)=>{if(e&&typeof e=="object"||typeof e=="function")for(let r of d(e))!p.call(t,r)&&r!==s&&o(t,r,{get:()=>e[r],enumerable:!(a=n(e,r))||a.enumerable});return t};var S=t=>R(o({},"__esModule",{value:!0}),t);var l={};u(l,{handler:()=>g});module.exports=S(l);var c=require("timers/promises"),g=async(t,e)=>{try{switch(t.RequestType){case"Create":await(0,c.setTimeout)(t.ResourceProperties.createDurationSeconds*1e3);break;case"Update":break;case"Delete":await(0,c.setTimeout)(t.ResourceProperties.destroyDurationSeconds*1e3);break}await i("SUCCESS",t,e)}catch(s){console.log(s),await i("FAILED",t,e,s.message)}},i=async(t,e,s,a)=>{let r=JSON.stringify({Status:t,Reason:a??"See the details in CloudWatch Log Stream: "+s.logStreamName,PhysicalResourceId:s.logStreamName,StackId:e.StackId,RequestId:e.RequestId,LogicalResourceId:e.LogicalResourceId,NoEcho:!1,Data:{}});await fetch(e.ResponseURL,{method:"PUT",body:r,headers:{"Content-Type":"","Content-Length":r.length.toString()}})};0&&(module.exports={handler});
-",
-        },
-        "Handler": "index.handler",
-        "MemorySize": 128,
-        "Role": {
-          "Fn::GetAtt": [
-            "TimeSleepCustomResourceHandler494c1b460d2f4e3b9bfd0b2cf10162f9ServiceRole47E386BD",
-            "Arn",
-          ],
-        },
-        "Runtime": "nodejs22.x",
-        "Timeout": 900,
-      },
-      "Type": "AWS::Lambda::Function",
-    },
-    "TimeSleepCustomResourceHandler494c1b460d2f4e3b9bfd0b2cf10162f9ServiceRole47E386BD": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "lambda.amazonaws.com",
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "ManagedPolicyArns": [
-          {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
-                {
-                  "Ref": "AWS::Partition",
-                },
-                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
-              ],
-            ],
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Role",
     },
     "Vpc8378EB38": {
       "Properties": {
@@ -4759,7 +4694,7 @@ exports[`Snapshot test (with CloudFront) 2`] = `
       "Properties": {
         "Code": {
           "S3Bucket": "cdk-hnb659fds-assets-123456789012-us-west-2",
-          "S3Key": "bdc104ed9cab1b5b6421713c8155f0b753380595356f710400609664d3635eca.zip",
+          "S3Key": "e16ffb3b34af185b8b30c88fdb19faa13b6c42bb38580485c4e84b384ee48b63.zip",
         },
         "Description": "AWS CDK resource provider framework - onEvent (TestStack/cdk-ses-smtp-credentials.CredentialsProvider/ses-smtp-credentials-provider)",
         "Environment": {
@@ -4783,7 +4718,7 @@ exports[`Snapshot test (with CloudFront) 2`] = `
             "Arn",
           ],
         },
-        "Runtime": "nodejs22.x",
+        "Runtime": "nodejs24.x",
         "Timeout": 900,
       },
       "Type": "AWS::Lambda::Function",

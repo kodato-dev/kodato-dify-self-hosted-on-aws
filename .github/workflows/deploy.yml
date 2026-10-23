@@ -54,9 +54,14 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '>=24.22.1 <25'
+          check-latest: true
         # CDK 実行に必要な Node.js をセットアップ
 
+      - name: Record Node.js runtime
+        run: |
+          node --version
+          node -p 'process.execPath'
       - name: Install NPM dependencies
         run: npm ci
         # パッケージをクリーンインストール（package-lock.json を使用）

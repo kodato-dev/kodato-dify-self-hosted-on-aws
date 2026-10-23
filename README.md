@@ -27,7 +27,7 @@ For a quick and convenient deployment, you can use the one-click deployment opti
 ## Prerequisites
 You must have the following dependencies installed to deploy this app:
 
-* [Node.js](https://nodejs.org/en/download/) (v18 or newer)
+* [Node.js](https://nodejs.org/en/download/) (24.22.1 or newer in the 24.x release line)
 * [Docker](https://docs.docker.com/get-docker/)
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) and IAM profile with Administrator policy
 
@@ -128,11 +128,10 @@ The below are the list of configurable parameters and their default values:
 
 1. ECS Task ([api.ts](./lib/constructs/dify-services/api.ts), [web.ts](./lib/constructs/dify-services/web.ts))
     1. Size
-        1. api/worker: 1024vCPU / 2048MB
+        1. api/worker: 2048 CPU units (2 vCPU) / 4096MB (configurable via `apiServiceCpu` / `apiServiceMemoryLimitMiB`)
         2. web: 256vCPU / 512MB
     2. Desired Count
         1. 1 task for each service
-        2. Currently the count of api service should be fixed to 1, because Dify plugin-daemon does not support scaling out well (See [dify-plugin-daemon#390](https://github.com/langgenius/dify-plugin-daemon/issues/390)). 
 2. ElastiCache ([redis.ts](./lib/constructs/redis.ts))
     1. Node Type: `cache.t4g.micro`
     2. Node Count: 1
@@ -300,6 +299,8 @@ If you set `customEcrRepositoryName` and have run the `copy-to-ecr.ts` script, p
 
 ## Cost
 
+This fork defaults the API task to 2048 CPU units / 4096 MiB to preserve its CPU exhaustion mitigation. The upstream cost example below uses 1024 CPU units and therefore does not estimate this fork's default API task cost.
+
 The following table provides a sample cost breakdown for deploying this system in the us-east-1 (N. Virginia) region for one month (when deployed using less expensive configuration).
 
 
@@ -307,16 +308,18 @@ The following table provides a sample cost breakdown for deploying this system i
 | --------------------| ----------------- | -------------------------------|
 | RDS Aurora | Postgres Serverless v2 (0 ACU) | $0 |
 | ElastiCache | Valkey t4g.micro | $9.2 |
-| ECS (Fargate) | Dify-web 1 task running 24/7 (256CPU) | $2.7 |
-| ECS (Fargate) | Dify-api/worker 1 task running 24/7 (1024CPU) | $10.7 |
+| ECS (Fargate) | Dify-web 1 task running 24/7 (256CPU / 512MB) | $2.7 |
+| ECS (Fargate) | Dify-api/worker 1 task running 24/7 (1024CPU / 4096MB) | $12.6 |
 | Application Load Balancer | ALB-hour per month | $17.5 |
 | VPC | NAT Instances t4g.nano x1 | $3.0 |
 | VPC | Public IP address x1 | $3.6 |
 | Secrets Manager | Secret x3 | $1.2 |
-| TOTAL | estimate per month | $47.9 |
+| TOTAL | estimate per month | $49.8 |
 
 Note that you have to pay LLM cost (e.g. Amazon Bedrock ) in addition to the above, which totally depends on your specific use case.
 
+## Maintainers
+* [Hiroaki Yoshimura (@yhiroaky)](https://github.com/yhiroaky)
 
 ## Security
 
