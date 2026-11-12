@@ -27,7 +27,7 @@ For a quick and convenient deployment, you can use the one-click deployment opti
 ## Prerequisites
 You must have the following dependencies installed to deploy this app:
 
-* [Node.js](https://nodejs.org/en/download/) (24.22.1 or newer in the 24.x release line)
+* [Node.js](https://nodejs.org/en/download/) (24.22.3 or newer in the 24.x release line)
 * [Docker](https://docs.docker.com/get-docker/)
 * [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) and IAM profile with Administrator policy
 
